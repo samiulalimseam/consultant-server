@@ -98,6 +98,39 @@ async function run(){
             const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '72h' })
             res.send({token});
         })
+        app.get('/getreviews/:id', async (req,res)=>{
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await reviewsCollection.findOne(query);
+            res.send(result);
+        })
+        app.post('/editreview/:id',async (req,res)=>{
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)}
+             const review = req.body;
+             console.log(review);
+             const option = {upsert: true};
+             const updatedreview = {
+                $set: {
+                    comment: review.comment,
+                    rating: parseInt(review.rating)
+                }
+             }
+             const result = await reviewsCollection.updateOne(filter, updatedreview,option)
+             console.log(review.rating);
+             res.send(result);
+
+        })
+
+        app.post('/review/delete/:id', async (req,res)=>{
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            console.log(id);
+            const result = await reviewsCollection.deleteOne(query)
+            res.send(result);
+
+
+        })
 
         
     }
